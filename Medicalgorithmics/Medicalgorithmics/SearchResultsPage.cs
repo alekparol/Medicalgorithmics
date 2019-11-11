@@ -18,6 +18,27 @@ namespace Medicalgorithmics
         protected List<IWebElement> specificArticleList;
         protected IWebElement nextPageButton;
 
+        public int CountSearchResults()
+        {
+            return articleList.Count;
+        }
+
+        public int CountSpecificArticleList()
+        {
+            return specificArticleList.Count;
+        }
+
+        public void GoToNextPageButton(IWebDriver driver)
+        {
+            Actions builder = new Actions(driver);
+            builder.MoveToElement(nextPageButton).Perform();
+        }
+
+        public void NextPageButtonClick()
+        {
+            nextPageButton.Click();
+        }
+
         public Boolean GetLoadingError()
         {
             return loadingError;
@@ -43,8 +64,6 @@ namespace Medicalgorithmics
                 }
 
                 nextPageButton = driver.FindElement(By.XPath("//i[contains(@class, 'fa fa-angle-right')]"));
-
-
 
             }
             else
