@@ -11,6 +11,8 @@ namespace Medicalgorithmics
     {
 
         public string expectedURLAddress = "https://www.medicalgorithmics.pl/?s=Pocket+ECG+CRS";
+        public string expectedURLAddressSecondPage = "https://www.medicalgorithmics.pl/page/2?s=Pocket+ECG+CRS";
+
         public string expectedTitle = "Wyniki wyszukiwania \"Pocket ECG CRS\" - Medicalgorithmics";
         private Boolean loadingError = false;
 
@@ -21,6 +23,11 @@ namespace Medicalgorithmics
         public int CountSearchResults()
         {
             return articleList.Count;
+        }
+
+        public List<IWebElement> GetSearchResults()
+        {
+            return articleList;
         }
 
         public int CountSpecificArticleList()
@@ -46,20 +53,28 @@ namespace Medicalgorithmics
 
         public SearchResultsPage(IWebDriver driver)
         {
-            if (driver.Url == expectedURLAddress)
+            if (driver.Url == expectedURLAddress || driver.Url == expectedURLAddressSecondPage)
             {
                 WebDriverWait wait = new WebDriverWait(driver, new TimeSpan(0, 0, 10));
-                wait.Until(Driver => driver.FindElement(By.XPath("//strong[text()='Logotypy']")));
+                wait.Until(Driver => driver.FindElement(By.ClassName("latest_post_custom")));
 
                 articleList = new List<IWebElement>(driver.FindElements(By.ClassName("latest_post_custom")));
-                specificArticleList = new List<IWebElement>();
 
-                foreach(IWebElement el in articleList)
+                
+                // This condition is created in order to initialize 'specificArticleList' only on the first page of the 
+                // search results. 
+
+                if(driver.Title == expectedTitle)
                 {
-                    List<IWebElement> newList = new List<IWebElement>(el.FindElements(By.XPath("descendant::a[contains(.,\"PocketECG CRS – telerehabilitacja kardiologiczna\")]")));
-                    if(newList.Count == 1)
+                    specificArticleList = new List<IWebElement>();
+
+                    foreach (IWebElement el in articleList)
                     {
-                        specificArticleList.Add(newList[0]);
+                        List<IWebElement> newList = new List<IWebElement>(el.FindElements(By.XPath("descendant::a[contains(.,\"PocketECG CRS – telerehabilitacja kardiologiczna\")]")));
+                        if (newList.Count == 1)
+                        {
+                            specificArticleList.Add(newList[0]);
+                        }
                     }
                 }
 
