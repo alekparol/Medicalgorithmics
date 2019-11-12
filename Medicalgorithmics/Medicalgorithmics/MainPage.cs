@@ -14,7 +14,7 @@ namespace Medicalgorithmics
         public string expectedURLAddress = "https://www.medicalgorithmics.pl/";
         private Boolean loadingError = false;
 
-        public IWebElement contactButton;
+        protected IWebElement contactButton;
         protected IWebElement acceptCookiesButton;
         protected IWebElement searchEngineButton;
         protected IWebElement searchEngineTextField;

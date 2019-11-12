@@ -61,7 +61,7 @@ namespace Medicalgorithmics
 
             /* Test for changing color of the "Kontakt" button */
             
-            string buttonColorAfterFocusing = mainPage.contactButton.GetCssValue("color");
+            string buttonColorAfterFocusing = mainPage.GetContactColor();
             Assert.NotEqual(buttonColorBeforeFocusing, buttonColorAfterFocusing);
 
             mainPage.ContactClick();
