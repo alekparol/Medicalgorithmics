@@ -269,7 +269,7 @@ namespace Medicalgorithmics
 
             /* Initializing firefoxdriver */
 
-            IWebDriver driver = new ChromeDriver();
+            IWebDriver driver = new FirefoxDriver();
             driver.Manage().Window.Maximize();
 
             driver.Navigate().GoToUrl("https://www.medicalgorithmics.pl/");
