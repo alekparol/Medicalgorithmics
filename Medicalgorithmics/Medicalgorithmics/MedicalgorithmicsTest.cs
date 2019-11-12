@@ -237,9 +237,6 @@ namespace Medicalgorithmics
             Thread.Sleep(3000);
             SearchResultsPage searchResults = new SearchResultsPage(driver);
 
-            string expectedURL = "https://www.medicalgorithmics.pl/?s=Pocket+ECG+CRS";
-            string expectedTitle = "Wyniki wyszukiwania \"Pocket ECG CRS\" - Medicalgorithmics";
-
             /* Test for correctly loaded search results page done by checking page title and URL address */
 
             Assert.Equal(searchResults.expectedURLAddress, driver.Url);
@@ -255,7 +252,7 @@ namespace Medicalgorithmics
 
             /* Test which determines that the next page of the search results is not empty and not the same as first page */
 
-            Assert.NotEqual(expectedURL, driver.Url);
+            Assert.NotEqual(searchResults.expectedURLAddress, driver.Url);
 
             SearchResultsPage searchResultsSecond = new SearchResultsPage(driver);
             Assert.False(searchResults.CountSearchResults() == searchResultsSecond.CountSearchResults());
@@ -290,9 +287,6 @@ namespace Medicalgorithmics
             Thread.Sleep(3000);
             SearchResultsPage searchResults = new SearchResultsPage(driver);
 
-            string expectedURL = "https://www.medicalgorithmics.pl/?s=Pocket+ECG+CRS";
-            string expectedTitle = "Wyniki wyszukiwania \"Pocket ECG CRS\" - Medicalgorithmics";
-
             /* Test for correctly loaded search results page done by checking page title and URL address */
 
             Assert.Equal(searchResults.expectedURLAddress, driver.Url);
@@ -308,7 +302,7 @@ namespace Medicalgorithmics
 
             /* Test which determines that the next page of the search results is not empty and not the same as first page */
 
-            Assert.NotEqual(expectedURL, driver.Url);
+            Assert.NotEqual(searchResults.expectedURLAddress, driver.Url);
 
             SearchResultsPage searchResultsSecond = new SearchResultsPage(driver);
             Assert.False(searchResults.CountSearchResults() == searchResultsSecond.CountSearchResults());
