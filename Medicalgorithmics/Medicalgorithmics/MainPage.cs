@@ -4,6 +4,7 @@ using OpenQA.Selenium.Support.UI;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 
 namespace Medicalgorithmics
 {
@@ -13,7 +14,7 @@ namespace Medicalgorithmics
         public string expectedURLAddress = "https://www.medicalgorithmics.pl/";
         private Boolean loadingError = false;
 
-        protected IWebElement contactButton;
+        public IWebElement contactButton;
         protected IWebElement acceptCookiesButton;
         protected IWebElement searchEngineButton;
         protected IWebElement searchEngineTextField;
@@ -31,7 +32,8 @@ namespace Medicalgorithmics
 
         public void ContactGoTo(IWebDriver driver)
         {
-            ((IJavaScriptExecutor)driver).ExecuteScript("arguments[0].scrollIntoView(true);", contactButton);
+            Actions builder = new Actions(driver);
+            builder.MoveToElement(contactButton).Perform();
         }
 
         public void AcceptCookies()

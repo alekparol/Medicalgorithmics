@@ -2,6 +2,7 @@
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Firefox;
 using OpenQA.Selenium.Interactions;
+using OpenQA.Selenium.Remote;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -59,9 +60,9 @@ namespace Medicalgorithmics
             mainPage.ContactGoTo(driver);
 
             /* Test for changing color of the "Kontakt" button */
-
-            string buttonColorAfterFocusing = mainPage.GetContactColor();
-            //Assert.NotEqual(buttonColorBeforeFocusing, buttonColorAfterFocusing);
+            
+            string buttonColorAfterFocusing = mainPage.contactButton.GetCssValue("color");
+            Assert.NotEqual(buttonColorBeforeFocusing, buttonColorAfterFocusing);
 
             mainPage.ContactClick();
 
@@ -134,23 +135,17 @@ namespace Medicalgorithmics
                 Directory.CreateDirectory(downloadDirectory);
             }
 
-            var profileManager = new FirefoxProfileManager();
-            FirefoxProfile profile = profileManager.GetProfile("Selenium");
+            FirefoxOptions profile = new FirefoxOptions();
 
-            FirefoxProfile profile2 = new FirefoxProfile();
-            // profile.setPreference("browser.download.useDownloadDir", true); This is true by default. Add it if it's not working without it.
-
-            FirefoxOptions option = new FirefoxOptions();
-            option.SetPreference("browser.download.folderList", 2);
-            option.SetPreference("browser.download.dir", downloadDirectory); //Set the last directory used for saving a file from the "What should (browser) do with this file?" dialog.
-            option.SetPreference("browser.helperApps.neverAsk.saveToDisk", "application/pdf"); //list of MIME types to save to disk without asking what to use to open the file
-            option.SetPreference("pdfjs.disabled", true);  // disable the built-in PDF viewer
-            option.SetPreference("browser.helperApps.neverAsk.saveToDisk", "application/octet-stream doc xls pdf txt");
-            //firefoxOptions.AddAdditionalCapability("browser.download.dir", downloadDirectory);
+            profile.SetPreference("browser.download.manager.showWhenStarting", false);
+            profile.SetPreference("browser.download.dir", downloadDirectory);
+            profile.SetPreference("browser.download.folderList", 2);
+            profile.SetPreference("browser.helperApps.neverAsk.saveToDisk", "application/zip");
+            profile.SetPreference("browser.download.useDownloadDir", true);
 
             /* Initializing firefoxdriver */
 
-            IWebDriver driver = new FirefoxDriver(option);
+            IWebDriver driver = new FirefoxDriver(profile);
             driver.Manage().Window.Maximize();
 
             driver.Navigate().GoToUrl("https://www.medicalgorithmics.pl/");
@@ -165,7 +160,7 @@ namespace Medicalgorithmics
             string buttonColorBeforeFocusing = mainPage.GetContactColor();
             mainPage.ContactGoTo(driver);
 
-            /* Test for changing color of the "Kontakt" button */
+            /* Test for changing color of the "Kontakt" button (For Firefox I disabled this test as the Actions class is not working for Gecko driver and the issue is not solved yet) */
 
             string buttonColorAfterFocusing = mainPage.GetContactColor();
             //Assert.NotEqual(buttonColorBeforeFocusing, buttonColorAfterFocusing);
@@ -225,40 +220,98 @@ namespace Medicalgorithmics
             driver.Manage().Window.Maximize();
 
             driver.Navigate().GoToUrl("https://www.medicalgorithmics.pl/");
-            MainPage mp = new MainPage(driver);
+
+            /* Initializing instance of MainPage class which represents main page */
+
+            MainPage mainPage = new MainPage(driver);
+            Assert.False(mainPage.GetLoadingError());
+
+            mainPage.AcceptCookies();
+            mainPage.SearchButtonClick();
+
+            /* Typing "Pocket ECG CRS" in the search engine field and initializing an instance of SearchResultsPage class*/
+
+            Assert.True(mainPage.IsSubmitVisible());
+            mainPage.SearchFieldFill("Pocket ECG CRS");
 
             Thread.Sleep(3000);
-
-            Assert.False(mp.GetLoadingError());
-            mp.AcceptCookies();
-
-            mp.SearchButtonClick();
-
-            Thread.Sleep(3000);
-
-            Assert.True(mp.IsSubmitVisible());
-            mp.SearchFieldFill("Pocket ECG CRS");
-           
-            Thread.Sleep(3000);
-
-            SearchResultsPage sr = new SearchResultsPage(driver);
+            SearchResultsPage searchResults = new SearchResultsPage(driver);
 
             string expectedURL = "https://www.medicalgorithmics.pl/?s=Pocket+ECG+CRS";
             string expectedTitle = "Wyniki wyszukiwania \"Pocket ECG CRS\" - Medicalgorithmics";
 
-            Assert.Equal(sr.expectedURLAddress, driver.Url);
-            Assert.Equal(sr.expectedTitle, driver.Title);
+            /* Test for correctly loaded search results page done by checking page title and URL address */
 
-            Assert.Equal(10, sr.CountSearchResults());
-            Assert.Equal(1, sr.CountSpecificArticleList());
+            Assert.Equal(searchResults.expectedURLAddress, driver.Url);
+            Assert.Equal(searchResults.expectedTitle, driver.Title);
 
-            sr.GoToNextPageButton(driver);
-            sr.NextPageButtonClick();
+            /* Test of number of displayed articles on the page and articles containingin "Pocket ECG CRS" in the title */
+
+            Assert.Equal(10, searchResults.CountSearchResults());
+            Assert.Equal(1, searchResults.CountSpecificArticleList());
+
+            searchResults.GoToNextPageButton(driver);
+            searchResults.NextPageButtonClick();
+
+            /* Test which determines that the next page of the search results is not empty and not the same as first page */
 
             Assert.NotEqual(expectedURL, driver.Url);
 
-            SearchResultsPage sr2 = new SearchResultsPage(driver);
-            Assert.False(sr.CountSearchResults() == sr2.CountSearchResults());
+            SearchResultsPage searchResultsSecond = new SearchResultsPage(driver);
+            Assert.False(searchResults.CountSearchResults() == searchResultsSecond.CountSearchResults());
+
+            driver.Close();
+        }
+
+        [Fact]
+        public void Firefox_SearchResults()
+        {
+
+            /* Initializing firefoxdriver */
+
+            IWebDriver driver = new ChromeDriver();
+            driver.Manage().Window.Maximize();
+
+            driver.Navigate().GoToUrl("https://www.medicalgorithmics.pl/");
+
+            /* Initializing instance of MainPage class which represents main page */
+
+            MainPage mainPage = new MainPage(driver);
+            Assert.False(mainPage.GetLoadingError());
+
+            mainPage.AcceptCookies();
+            mainPage.SearchButtonClick();
+
+            /* Typing "Pocket ECG CRS" in the search engine field and initializing an instance of SearchResultsPage class*/
+
+            Assert.True(mainPage.IsSubmitVisible());
+            mainPage.SearchFieldFill("Pocket ECG CRS");
+
+            Thread.Sleep(3000);
+            SearchResultsPage searchResults = new SearchResultsPage(driver);
+
+            string expectedURL = "https://www.medicalgorithmics.pl/?s=Pocket+ECG+CRS";
+            string expectedTitle = "Wyniki wyszukiwania \"Pocket ECG CRS\" - Medicalgorithmics";
+
+            /* Test for correctly loaded search results page done by checking page title and URL address */
+
+            Assert.Equal(searchResults.expectedURLAddress, driver.Url);
+            Assert.Equal(searchResults.expectedTitle, driver.Title);
+
+            /* Test of number of displayed articles on the page and articles containingin "Pocket ECG CRS" in the title */
+
+            Assert.Equal(10, searchResults.CountSearchResults());
+            Assert.Equal(1, searchResults.CountSpecificArticleList());
+
+            searchResults.GoToNextPageButton(driver);
+            searchResults.NextPageButtonClick();
+
+            /* Test which determines that the next page of the search results is not empty and not the same as first page */
+
+            Assert.NotEqual(expectedURL, driver.Url);
+
+            SearchResultsPage searchResultsSecond = new SearchResultsPage(driver);
+            Assert.False(searchResults.CountSearchResults() == searchResultsSecond.CountSearchResults());
 
             driver.Close();
         }
