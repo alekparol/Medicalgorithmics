@@ -13,7 +13,7 @@ namespace Medicalgorithmics
         public string expectedURLAddress = "https://www.medicalgorithmics.pl/kontakt";
         private Boolean loadingError = false;
 
-        protected IWebElement mediaPackButton;
+        private IWebElement mediaPackButton;
 
         public void MediaPackClick()
         {
@@ -22,8 +22,7 @@ namespace Medicalgorithmics
 
         public void ScrollToTheMediaPack(IWebDriver driver)
         {
-            Actions builder = new Actions(driver);
-            builder.MoveToElement(mediaPackButton).Perform();
+            ((IJavaScriptExecutor)driver).ExecuteScript("arguments[0].scrollIntoView(true);", mediaPackButton);
         }
 
         public Boolean GetLoadingError()

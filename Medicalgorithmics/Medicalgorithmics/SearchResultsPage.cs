@@ -37,8 +37,7 @@ namespace Medicalgorithmics
 
         public void GoToNextPageButton(IWebDriver driver)
         {
-            Actions builder = new Actions(driver);
-            builder.MoveToElement(nextPageButton).Perform();
+            ((IJavaScriptExecutor)driver).ExecuteScript("arguments[0].scrollIntoView(true);", nextPageButton);
         }
 
         public void NextPageButtonClick()

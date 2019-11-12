@@ -31,8 +31,7 @@ namespace Medicalgorithmics
 
         public void ContactGoTo(IWebDriver driver)
         {
-            Actions builder = new Actions(driver);
-            builder.MoveToElement(contactButton).Perform();
+            ((IJavaScriptExecutor)driver).ExecuteScript("arguments[0].scrollIntoView(true);", contactButton);
         }
 
         public void AcceptCookies()
